@@ -2,128 +2,222 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Analizador de Riesgo Cardiovascular</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardioCheck AI | Analizador de Riesgo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f2f4f8;
-            text-align: center;
-            padding: 40px;
-        }
-
-        h1 {
-            color: #1e293b;
-        }
-
-        .card {
-            background: white;
-            padding: 25px;
-            border-radius: 10px;
-            display: inline-block;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            width: 90%;
-            max-width: 700px;
-        }
-
-        button {
-            padding: 10px 20px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background: #1d4ed8;
-        }
-
-        .resultado {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .paciente {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 6px;
-        }
-
-        .alto { color: red; font-weight: bold; }
-        .moderado { color: orange; font-weight: bold; }
-        .bajo { color: green; font-weight: bold; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
     </style>
 </head>
-<body>
+<body class="text-slate-800">
 
-<h1>🫀 Analizador de Riesgo Cardiovascular</h1>
+    <nav class="bg-white border-b border-slate-200 py-4 mb-8">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i data-lucide="heart-pulse" class="text-red-600 w-8 h-8"></i>
+                <span class="text-xl font-bold tracking-tight text-slate-900">CardioCheck <span class="text-red-600">AI</span></span>
+            </div>
+            <div class="text-sm text-slate-500 font-medium italic">Plataforma de Análisis Epidemiológico</div>
+        </div>
+    </nav>
 
-<div class="card">
-    <input type="file" id="fileInput">
-    <br><br>
-    <button onclick="enviarArchivo()">Analizar</button>
+    <main class="container mx-auto px-6 max-w-5xl">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-1">
+                <div class="glass-card p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                        <i data-lucide="file-up" class="w-5 h-5 text-blue-500"></i> Cargar Datos
+                    </h2>
+                    <p class="text-sm text-slate-500 mb-6">Suba su archivo CSV con el formato estandarizado para iniciar el análisis.</p>
+                    
+                    <div class="space-y-4">
+                        <div id="dropzone" class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-blue-500 transition-colors cursor-pointer bg-slate-50">
+                            <input type="file" id="fileInput" class="hidden" accept=".csv" />
+                            <i data-lucide="upload-cloud" class="mx-auto w-10 h-10 text-slate-400 mb-2"></i>
+                            <span id="fileName" class="text-xs text-slate-600 block truncate">Seleccionar CSV</span>
+                        </div>
+                        
+                        <button onclick="analizar()" id="btnAnalizar" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition-all flex justify-center items-center gap-2 shadow-lg shadow-slate-200">
+                            <span>Ejecutar Análisis</span>
+                        </button>
+                    </div>
 
-    <div class="resultado" id="resultado"></div>
-</div>
-
-<script>
-async function enviarArchivo() {
-    const input = document.getElementById("fileInput");
-    const resultado = document.getElementById("resultado");
-
-    if (!input.files.length) {
-        alert("Selecciona un archivo CSV");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", input.files[0]);
-
-    resultado.innerHTML = "⏳ Analizando archivo...";
-
-    try {
-        const response = await fetch(
-            "https://analisis-rcv.onrender.com/analizar",
-            {
-                method: "POST",
-                body: formData
-            }
-        );
-
-        const data = await response.json();
-
-        let html = `<h3>Total pacientes: ${data.total_pacientes}</h3>`;
-
-        data.pacientes.forEach(p => {
-            let clase = "bajo";
-            if (p.riesgo === "MODERADO") clase = "moderado";
-            if (p.riesgo === "ALTO" || p.riesgo === "MUY ALTO") clase = "alto";
-
-            html += `
-                <div class="paciente">
-                    <b>${p.nombre}</b><br>
-                    Edad: ${p.edad}<br>
-                    HTA: ${p.hta}<br>
-                    Diabetes: ${p.diabetes}<br>
-                    IMC: ${p.imc}<br>
-                    TFG: ${p.tfg}<br>
-                    <span class="${clase}">
-                        Riesgo: ${p.riesgo}
-                    </span>
+                    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+                        <h4 class="text-xs font-bold text-blue-700 uppercase mb-2">Requisitos</h4>
+                        <ul class="text-[11px] text-blue-600 space-y-1">
+                            <li>• Formato: CSV (separado por ;)</li>
+                            <li>• Columnas: edad, hta, dm, ldl, imc</li>
+                        </ul>
+                    </div>
                 </div>
-            `;
-        });
+            </div>
 
-        resultado.innerHTML = html;
+            <div class="lg:col-span-2">
+                <div id="placeholder" class="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-12 text-slate-400">
+                    <i data-lucide="bar-chart-3" class="w-16 h-16 mb-4 opacity-20"></i>
+                    <p>Los resultados aparecerán aquí tras el procesamiento</p>
+                </div>
 
-    } catch (error) {
-        resultado.innerHTML = "❌ Error al procesar el archivo";
-        console.error(error);
-    }
-}
-</script>
+                <div id="resultsContent" class="hidden space-y-6">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <div class="text-slate-500 text-xs mb-1">Total Registros</div>
+                            <div id="statTotal" class="text-2xl font-bold text-slate-900">-</div>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-100 shadow-sm">
+                            <div class="text-red-600 text-xs mb-1">Riesgo Alto</div>
+                            <div id="statAlto" class="text-2xl font-bold text-red-700">-</div>
+                        </div>
+                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 shadow-sm">
+                            <div class="text-amber-600 text-xs mb-1">Riesgo Moderado</div>
+                            <div id="statMod" class="text-2xl font-bold text-amber-700">-</div>
+                        </div>
+                    </div>
 
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                        <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-5 h-5"></i> Distribución de Riesgo
+                        </h3>
+                        <div class="h-64 flex justify-center mb-8">
+                            <canvas id="riesgoChart"></canvas>
+                        </div>
+
+                        <h3 class="font-bold text-slate-800 mb-4">Vista previa de resultados</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
+                                    <tr>
+                                        <th class="px-4 py-3">Edad</th>
+                                        <th class="px-4 py-3 text-center">LDL</th>
+                                        <th class="px-4 py-3 text-center">IMC</th>
+                                        <th class="px-4 py-3 text-right">Diagnóstico</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tableBody" class="divide-y divide-slate-100">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Inicializar Iconos
+        lucide.createIcons();
+
+        // Manejo de Dropzone
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameSpan = document.getElementById('fileName');
+
+        dropzone.onclick = () => fileInput.click();
+        fileInput.onchange = () => {
+            if(fileInput.files.length) fileNameSpan.textContent = fileInput.files[0].name;
+        };
+
+        let myChart = null;
+
+        async function analizar() {
+            if (!fileInput.files.length) {
+                alert("Por favor seleccione un archivo CSV");
+                return;
+            }
+
+            const btn = document.getElementById('btnAnalizar');
+            btn.disabled = true;
+            btn.innerHTML = `<span class="animate-spin mr-2">◌</span> Procesando...`;
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                const response = await fetch("https://analisis-rcv.onrender.com/analizar", {
+                    method: "POST",
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    alert("Error: " + (data.detalle || data.error));
+                } else {
+                    mostrarResultados(data);
+                }
+            } catch (err) {
+                alert("Error de conexión con el servidor");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>Ejecutar Análisis</span>`;
+            }
+        }
+
+        function mostrarResultados(data) {
+            document.getElementById('placeholder').classList.add('hidden');
+            document.getElementById('resultsContent').classList.remove('hidden');
+
+            // Actualizar Stats
+            document.getElementById('statTotal').textContent = data.registros;
+            document.getElementById('statAlto').textContent = data.riesgo_alto;
+            document.getElementById('statMod').textContent = data.riesgo_moderado;
+
+            // Actualizar Tabla
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = data.ejemplo.map(row => `
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="px-4 py-4 font-medium">${row.edad} años</td>
+                    <td class="px-4 py-4 text-center text-slate-500">${row.ldl}</td>
+                    <td class="px-4 py-4 text-center text-slate-500">${row.imc}</td>
+                    <td class="px-4 py-4 text-right">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-bold ${getBadgeColor(row.riesgo)}">
+                            ${row.riesgo}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Gráfico
+            renderChart(data);
+        }
+
+        function getBadgeColor(riesgo) {
+            if (riesgo === 'RIESGO ALTO') return 'bg-red-100 text-red-700';
+            if (riesgo === 'RIESGO MODERADO') return 'bg-amber-100 text-amber-700';
+            return 'bg-emerald-100 text-emerald-700';
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('riesgoChart').getContext('2d');
+            
+            if (myChart) myChart.destroy();
+
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Alto', 'Moderado', 'Bajo'],
+                    datasets: [{
+                        data: [data.riesgo_alto, data.riesgo_moderado, data.riesgo_bajo],
+                        backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+    </script>
 </body>
 </html>
