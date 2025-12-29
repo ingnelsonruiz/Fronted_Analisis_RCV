@@ -3,99 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CardioCheck AI | Analizador de Riesgo</title>
+    <title>CardioCheck Pro | Analizador de Riesgo Cardiovascular</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .medical-card { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .status-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
-<body class="text-slate-800">
+<body class="text-slate-900">
 
-    <nav class="bg-white border-b border-slate-200 py-4 mb-8">
+    <header class="bg-slate-900 text-white py-4 shadow-lg">
         <div class="container mx-auto px-6 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <i data-lucide="heart-pulse" class="text-red-600 w-8 h-8"></i>
-                <span class="text-xl font-bold tracking-tight text-slate-900">CardioCheck <span class="text-red-600">AI</span></span>
+            <div class="flex items-center gap-3">
+                <div class="bg-red-600 p-2 rounded-lg">
+                    <i data-lucide="activity" class="text-white w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold leading-none">CardioCheck <span class="text-red-500">AI</span></h1>
+                    <p class="text-[10px] uppercase tracking-widest text-slate-400">Advanced RCV Analysis System</p>
+                </div>
             </div>
-            <div class="text-sm text-slate-500 font-medium italic">Plataforma de Análisis Epidemiológico</div>
+            <div class="hidden md:block">
+                <span class="text-xs bg-slate-800 px-3 py-1 rounded-full border border-slate-700 text-slate-300">
+                    Servidor: <span id="serverStatus" class="text-emerald-400 font-bold italic">En línea</span>
+                </span>
+            </div>
         </div>
-    </nav>
+    </header>
 
-    <main class="container mx-auto px-6 max-w-5xl">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <main class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <div class="lg:col-span-1">
-                <div class="glass-card p-6 rounded-2xl border border-slate-200 shadow-sm">
-                    <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <i data-lucide="file-up" class="w-5 h-5 text-blue-500"></i> Cargar Datos
+            <div class="lg:col-span-4 space-y-6">
+                <div class="medical-card p-6">
+                    <h2 class="font-bold text-lg mb-4 flex items-center gap-2">
+                        <i data-lucide="database" class="w-5 h-5 text-blue-600"></i> Importar Datos
                     </h2>
-                    <p class="text-sm text-slate-500 mb-6">Suba su archivo CSV con el formato estandarizado para iniciar el análisis.</p>
                     
-                    <div class="space-y-4">
-                        <div id="dropzone" class="border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-blue-500 transition-colors cursor-pointer bg-slate-50">
-                            <input type="file" id="fileInput" class="hidden" accept=".csv" />
-                            <i data-lucide="upload-cloud" class="mx-auto w-10 h-10 text-slate-400 mb-2"></i>
-                            <span id="fileName" class="text-xs text-slate-600 block truncate">Seleccionar CSV</span>
-                        </div>
-                        
-                        <button onclick="analizar()" id="btnAnalizar" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition-all flex justify-center items-center gap-2 shadow-lg shadow-slate-200">
-                            <span>Ejecutar Análisis</span>
-                        </button>
+                    <div id="dropzone" class="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:border-blue-500 hover:bg-blue-50 transition-all cursor-pointer group">
+                        <input type="file" id="fileInput" class="hidden" accept=".csv" />
+                        <i data-lucide="file-spreadsheet" class="mx-auto w-12 h-12 text-slate-300 group-hover:text-blue-500 mb-3 transition-colors"></i>
+                        <p id="fileName" class="text-sm font-medium text-slate-600">Haz clic o arrastra tu archivo CSV</p>
+                        <p class="text-[10px] text-slate-400 mt-2 italic">Solo archivos separados por punto y coma (;)</p>
                     </div>
+                    
+                    <button onclick="analizar()" id="btnAnalizar" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-md flex justify-center items-center gap-2">
+                        <i data-lucide="play-circle" class="w-5 h-5"></i>
+                        <span>INICIAR ANÁLISIS MÉDICO</span>
+                    </button>
+                </div>
 
-                    <div class="mt-8 p-4 bg-blue-50 rounded-lg">
-                        <h4 class="text-xs font-bold text-blue-700 uppercase mb-2">Requisitos</h4>
-                        <ul class="text-[11px] text-blue-600 space-y-1">
-                            <li>• Formato: CSV (separado por ;)</li>
-                            <li>• Columnas: edad, hta, dm, ldl, imc</li>
-                        </ul>
-                    </div>
+                <div class="bg-white border-l-4 border-amber-500 p-4 rounded-r-xl shadow-sm">
+                    <h4 class="text-xs font-bold text-amber-700 uppercase flex items-center gap-1">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i> Nota importante
+                    </h4>
+                    <p class="text-[11px] text-slate-600 mt-1">
+                        Este sistema analiza columnas específicas: <code class="bg-amber-50 px-1 italic">EDAD</code>, <code class="bg-amber-50 px-1 italic">LDL</code>, <code class="bg-amber-50 px-1 italic">IMC</code>, <code class="bg-amber-50 px-1 italic">DX CONFIRMADO HTA</code> y <code class="bg-amber-50 px-1 italic">DX CONFIRMADO DM</code>.
+                    </p>
                 </div>
             </div>
 
-            <div class="lg:col-span-2">
-                <div id="placeholder" class="h-full flex flex-col items-center justify-center border-2 border-dashed border-slate-200 rounded-2xl p-12 text-slate-400">
-                    <i data-lucide="bar-chart-3" class="w-16 h-16 mb-4 opacity-20"></i>
-                    <p>Los resultados aparecerán aquí tras el procesamiento</p>
+            <div class="lg:col-span-8">
+                <div id="placeholder" class="bg-white rounded-2xl border-2 border-dashed border-slate-200 h-[500px] flex flex-col items-center justify-center text-slate-400">
+                    <div class="bg-slate-50 p-6 rounded-full mb-4">
+                        <i data-lucide="microscope" class="w-16 h-16 opacity-20"></i>
+                    </div>
+                    <h3 class="text-lg font-medium">Esperando procesamiento de datos</h3>
+                    <p class="text-sm">Cargue un archivo para ver la interpretación clínica</p>
                 </div>
 
-                <div id="resultsContent" class="hidden space-y-6">
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                            <div class="text-slate-500 text-xs mb-1">Total Registros</div>
-                            <div id="statTotal" class="text-2xl font-bold text-slate-900">-</div>
+                <div id="resultsContent" class="hidden space-y-6 animate-in fade-in duration-500">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-xl border border-slate-200">
+                            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Población Analizada</p>
+                            <h3 id="statTotal" class="text-3xl font-black text-slate-800">-</h3>
                         </div>
-                        <div class="bg-red-50 p-4 rounded-xl border border-red-100 shadow-sm">
-                            <div class="text-red-600 text-xs mb-1">Riesgo Alto</div>
-                            <div id="statAlto" class="text-2xl font-bold text-red-700">-</div>
+                        <div class="bg-red-50 p-5 rounded-xl border border-red-100">
+                            <p class="text-red-600 text-[10px] uppercase font-bold tracking-widest">Riesgo Alto (Prioridad)</p>
+                            <h3 id="statAlto" class="text-3xl font-black text-red-700">-</h3>
                         </div>
-                        <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 shadow-sm">
-                            <div class="text-amber-600 text-xs mb-1">Riesgo Moderado</div>
-                            <div id="statMod" class="text-2xl font-bold text-amber-700">-</div>
+                        <div class="bg-white p-5 rounded-xl border border-slate-200">
+                            <p class="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Riesgo Bajo/Mod</p>
+                            <h3 id="statOtros" class="text-3xl font-black text-slate-800">-</h3>
                         </div>
                     </div>
 
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                        <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
-                            <i data-lucide="pie-chart" class="w-5 h-5"></i> Distribución de Riesgo
-                        </h3>
-                        <div class="h-64 flex justify-center mb-8">
-                            <canvas id="riesgoChart"></canvas>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="medical-card p-6 flex flex-col items-center justify-center">
+                            <h4 class="text-sm font-bold text-slate-700 self-start mb-4 italic">Distribución de Población</h4>
+                            <div class="w-full h-48">
+                                <canvas id="riesgoChart"></canvas>
+                            </div>
                         </div>
+                        <div class="medical-card p-6 bg-slate-900 text-white">
+                            <h4 class="text-sm font-bold text-slate-400 mb-4 uppercase">Resumen Ejecutivo</h4>
+                            <div id="resumenEjecutivo" class="text-sm space-y-3 leading-relaxed">
+                                </div>
+                        </div>
+                    </div>
 
-                        <h3 class="font-bold text-slate-800 mb-4">Vista previa de resultados</h3>
+                    <div class="medical-card overflow-hidden">
+                        <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                            <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                                <i data-lucide="list-checks" class="w-5 h-5"></i> Detalle Clínico por Paciente
+                            </h3>
+                            <span class="text-[10px] bg-white px-2 py-1 rounded border shadow-sm font-bold text-slate-500 uppercase">Top Alertas</span>
+                        </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-left">
-                                <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] font-bold">
-                                    <tr>
-                                        <th class="px-4 py-3">Edad</th>
-                                        <th class="px-4 py-3 text-center">LDL</th>
-                                        <th class="px-4 py-3 text-center">IMC</th>
-                                        <th class="px-4 py-3 text-right">Diagnóstico</th>
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 text-[10px] text-slate-400 uppercase tracking-wider">
+                                        <th class="px-6 py-3 font-bold">Paciente</th>
+                                        <th class="px-6 py-3 font-bold">Alertas Clínicas</th>
+                                        <th class="px-6 py-3 font-bold text-right">Estatus RCV</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tableBody" class="divide-y divide-slate-100">
@@ -109,35 +135,37 @@
     </main>
 
     <script>
-        // Inicializar Iconos
         lucide.createIcons();
 
-        // Manejo de Dropzone
         const dropzone = document.getElementById('dropzone');
         const fileInput = document.getElementById('fileInput');
         const fileNameSpan = document.getElementById('fileName');
+        let myChart = null;
 
         dropzone.onclick = () => fileInput.click();
         fileInput.onchange = () => {
-            if(fileInput.files.length) fileNameSpan.textContent = fileInput.files[0].name;
+            if(fileInput.files.length) {
+                fileNameSpan.textContent = fileInput.files[0].name;
+                fileNameSpan.classList.add('text-blue-600', 'font-bold');
+            }
         };
-
-        let myChart = null;
 
         async function analizar() {
             if (!fileInput.files.length) {
-                alert("Por favor seleccione un archivo CSV");
+                alert("Seleccione un archivo CSV primero");
                 return;
             }
 
             const btn = document.getElementById('btnAnalizar');
             btn.disabled = true;
-            btn.innerHTML = `<span class="animate-spin mr-2">◌</span> Procesando...`;
+            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-5 h-5 animate-spin"></i> PROCESANDO...`;
+            lucide.createIcons();
 
             const formData = new FormData();
             formData.append("file", fileInput.files[0]);
 
             try {
+                // CAMBIA ESTA URL SI TU BACKEND ES DIFERENTE
                 const response = await fetch("https://analisis-rcv.onrender.com/analizar", {
                     method: "POST",
                     body: formData
@@ -146,15 +174,16 @@
                 const data = await response.json();
 
                 if (data.error) {
-                    alert("Error: " + (data.detalle || data.error));
+                    alert("Error en el archivo: " + data.error);
                 } else {
                     mostrarResultados(data);
                 }
             } catch (err) {
-                alert("Error de conexión con el servidor");
+                alert("Error crítico: El servidor no responde (Render Cold Start). Intente de nuevo en 30 segundos.");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<span>Ejecutar Análisis</span>`;
+                btn.innerHTML = `<i data-lucide="play-circle" class="w-5 h-5"></i> INICIAR ANÁLISIS MÉDICO`;
+                lucide.createIcons();
             }
         }
 
@@ -162,39 +191,57 @@
             document.getElementById('placeholder').classList.add('hidden');
             document.getElementById('resultsContent').classList.remove('hidden');
 
-            // Actualizar Stats
+            // Actualizar KPIs
             document.getElementById('statTotal').textContent = data.registros;
             document.getElementById('statAlto').textContent = data.riesgo_alto;
-            document.getElementById('statMod').textContent = data.riesgo_moderado;
+            document.getElementById('statOtros').textContent = data.riesgo_moderado + data.riesgo_bajo;
 
-            // Actualizar Tabla
+            // Generar Resumen Ejecutivo
+            const resumen = document.getElementById('resumenEjecutivo');
+            resumen.innerHTML = `
+                <p>• Se identificaron <span class="text-red-400 font-bold">${data.riesgo_alto} pacientes</span> con RCV Alto que requieren intervención farmacológica inmediata.</p>
+                <p>• El <span class="text-blue-400 font-bold">${Math.round((data.riesgo_alto/data.registros)*100)}%</span> de la muestra presenta descompensación en metas de LDL o diagnóstico de Diabetes.</p>
+                <p>• Sugerencia: Priorizar agenda para medicina interna a los pacientes listados con alertas rojas.</p>
+            `;
+
+            // Llenar Tabla Médica
             const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = data.ejemplo.map(row => `
+            tableBody.innerHTML = data.detalle_clinico.map(p => `
                 <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="px-4 py-4 font-medium">${row.edad} años</td>
-                    <td class="px-4 py-4 text-center text-slate-500">${row.ldl}</td>
-                    <td class="px-4 py-4 text-center text-slate-500">${row.imc}</td>
-                    <td class="px-4 py-4 text-right">
-                        <span class="px-2 py-1 rounded-full text-[10px] font-bold ${getBadgeColor(row.riesgo)}">
-                            ${row.riesgo}
+                    <td class="px-6 py-4">
+                        <p class="font-bold text-slate-800 leading-tight">${p.nombre}</p>
+                        <p class="text-[10px] text-slate-400 uppercase font-medium">${p.edad || '??'} años</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-wrap gap-1">
+                            ${p.alertas.map(a => `
+                                <span class="bg-red-50 text-red-600 text-[9px] px-2 py-0.5 rounded-full border border-red-100 font-medium">
+                                    ${a}
+                                </span>
+                            `).join('') || '<span class="text-slate-300 text-[10px]">Sin alertas críticas</span>'}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <span class="inline-block px-3 py-1 rounded-lg text-[10px] font-black tracking-tighter ${getBadgeStyle(p.riesgo)}">
+                            ${p.riesgo}
                         </span>
+                        <p class="text-[9px] mt-1 text-slate-500 italic">${p.sugerencia}</p>
                     </td>
                 </tr>
             `).join('');
 
-            // Gráfico
             renderChart(data);
+            window.scrollTo({ top: 400, behavior: 'smooth' });
         }
 
-        function getBadgeColor(riesgo) {
-            if (riesgo === 'RIESGO ALTO') return 'bg-red-100 text-red-700';
-            if (riesgo === 'RIESGO MODERADO') return 'bg-amber-100 text-amber-700';
-            return 'bg-emerald-100 text-emerald-700';
+        function getBadgeStyle(riesgo) {
+            if (riesgo === 'ALTO') return 'bg-red-600 text-white';
+            if (riesgo === 'MODERADO') return 'bg-amber-400 text-slate-900';
+            return 'bg-emerald-500 text-white';
         }
 
         function renderChart(data) {
             const ctx = document.getElementById('riesgoChart').getContext('2d');
-            
             if (myChart) myChart.destroy();
 
             myChart = new Chart(ctx, {
@@ -203,18 +250,18 @@
                     labels: ['Alto', 'Moderado', 'Bajo'],
                     datasets: [{
                         data: [data.riesgo_alto, data.riesgo_moderado, data.riesgo_bajo],
-                        backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
-                        borderWidth: 0,
-                        hoverOffset: 10
+                        backgroundColor: ['#dc2626', '#fbbf24', '#10b981'],
+                        hoverOffset: 15,
+                        borderWidth: 0
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom' }
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } } }
                     },
-                    cutout: '70%'
+                    cutout: '75%'
                 }
             });
         }
