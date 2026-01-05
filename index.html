@@ -1,159 +1,167 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CardioCheck AI | Analítica IPSI KANKUAMA</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 1.5rem; }
-        
-        /* Estilos específicos para el Informe Médico de la IA */
-        .ia-report h3 { color: #3b82f6; font-weight: 800; text-transform: uppercase; font-size: 0.9rem; margin-top: 1.5rem; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 8px; }
-        .ia-report p { margin-bottom: 0.8rem; color: #cbd5e1; line-height: 1.6; }
-        .ia-report ul { margin-bottom: 1.2rem; space-y: 0.5rem; }
-        .ia-report li { position: relative; padding-left: 1.5rem; margin-bottom: 0.5rem; color: #94a3b8; }
-        .ia-report li::before { content: "•"; position: absolute; left: 0; color: #3b82f6; font-weight: bold; font-size: 1.2rem; line-height: 1; }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardioCheck AI | Red de Prestadores</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #020617;
+    color: #e5e7eb;
+}
+
+.glass {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 1.25rem;
+}
+</style>
 </head>
-<body class="p-4 md:p-8">
 
-    <header class="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-            <div class="flex items-center gap-2 mb-1">
-                <h1 class="text-3xl font-extrabold tracking-tight italic">CardioCheck <span class="text-blue-500 underline decoration-blue-500/30">AI</span></h1>
-            </div>
-            <p class="text-slate-400 text-sm font-medium">Auditoría Clínica Especializada • IPSI KANKUAMA</p>
-        </div>
-        <div class="glass-card px-4 py-2 flex items-center gap-3 border-emerald-500/30 bg-emerald-500/5">
-            <i data-lucide="check-circle" class="text-emerald-400 w-5 h-5"></i>
-            <div class="text-xs">
-                <p class="text-slate-500 uppercase font-bold text-[9px]">Sincronización</p>
-                <p class="font-bold text-emerald-400 uppercase">Datos Resolución 0256 OK</p>
-            </div>
-        </div>
-    </header>
+<body class="p-6">
 
-    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <div class="lg:col-span-4 space-y-6">
-            <div class="glass-card p-8 border-t-4 border-blue-600 shadow-2xl">
-                <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
-                    <i data-lucide="file-up" class="text-blue-500"></i> Procesar CSV
-                </h2>
-                
-                <div id="dropzone" class="border-2 border-dashed border-slate-700 rounded-2xl p-8 text-center hover:border-blue-500 hover:bg-blue-500/5 transition-all cursor-pointer group mb-6">
-                    <input type="file" id="fileInput" class="hidden" accept=".csv" />
-                    <i data-lucide="upload" class="text-slate-500 w-10 h-10 mx-auto mb-4 group-hover:text-blue-500 transition-colors"></i>
-                    <p id="fileName" class="text-sm text-slate-400 font-bold truncate">IPSI_KANKUAMA.csv</p>
-                </div>
-                
-                <button onclick="analizar()" id="btnAnalizar" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl transition-all flex justify-center items-center gap-3">
-                    <i data-lucide="play-circle" class="w-5 h-5"></i>
-                    <span>CORRER AUDITORÍA</span>
-                </button>
-            </div>
+<!-- ================= HEADER ================= -->
+<header class="max-w-7xl mx-auto mb-10 flex justify-between items-center">
+    <div>
+        <h1 class="text-3xl font-extrabold italic">
+            CardioCheck <span class="text-blue-500">AI</span>
+        </h1>
+        <p class="text-slate-400 text-sm">Analítica Clínica • Red de Prestadores</p>
+    </div>
+
+    <div id="prestadorBox" class="glass px-5 py-3 hidden">
+        <p class="text-[10px] uppercase text-slate-400 font-bold">Prestador Analizado</p>
+        <p id="prestadorNombre" class="font-extrabold text-blue-400"></p>
+    </div>
+</header>
+
+<!-- ================= MAIN ================= -->
+<main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+<!-- ====== PANEL CARGA ====== -->
+<section class="lg:col-span-4">
+    <div class="glass p-8 space-y-6">
+        <h2 class="font-black text-lg flex gap-2">
+            <i data-lucide="upload-cloud"></i> Cargar Cohorte CSV
+        </h2>
+
+        <div id="dropzone" class="border-2 border-dashed border-slate-700 rounded-xl p-6 text-center cursor-pointer hover:border-blue-500">
+            <input type="file" id="fileInput" accept=".csv" hidden>
+            <p id="fileName" class="text-sm text-slate-400 font-bold">Seleccione archivo CSV</p>
         </div>
 
-        <div class="lg:col-span-8 space-y-6">
-            <div id="placeholder" class="glass-card h-64 flex flex-col items-center justify-center text-slate-600 border-2 border-dashed border-slate-800">
-                <i data-lucide="activity" class="w-12 h-12 mb-4 opacity-20"></i>
-                <p class="font-bold">Cargue la cohorte para ver el análisis médico</p>
-            </div>
+        <button id="btnAnalizar" onclick="analizar()" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-xl font-black">
+            <i data-lucide="activity"></i> ANALIZAR COHORTE
+        </button>
+    </div>
+</section>
 
-            <div id="resultsContent" class="hidden space-y-6">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="glass-card p-5"><p class="text-[10px] uppercase font-bold text-slate-500">Total</p><h3 id="statTotal" class="text-2xl font-black">-</h3></div>
-                    <div class="glass-card p-5 border-l-4 border-red-500"><p class="text-[10px] uppercase font-bold text-red-500">Críticos</p><h3 id="statAlto" class="text-2xl font-black">-</h3></div>
-                    <div class="glass-card p-5 border-l-4 border-amber-500"><p class="text-[10px] uppercase font-bold text-amber-500">Alerta</p><h3 id="statMod" class="text-2xl font-black">-</h3></div>
-                    <div class="glass-card p-5 border-l-4 border-emerald-500"><p class="text-[10px] uppercase font-bold text-emerald-500">Estables</p><h3 id="statBajo" class="text-2xl font-black">-</h3></div>
-                </div>
+<!-- ====== RESULTADOS ====== -->
+<section class="lg:col-span-8 space-y-6">
 
-                <div class="glass-card p-8 bg-slate-800/20 border border-blue-500/10">
-                    <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
-                        <i data-lucide="file-text" class="text-blue-500"></i>
-                        <h2 class="text-lg font-extrabold uppercase tracking-tight">Informe Ejecutivo de Cohorte</h2>
-                    </div>
-                    <div id="informeIA" class="ia-report custom-scrollbar max-h-[500px] overflow-y-auto pr-4">
-                        </div>
-                </div>
-            </div>
-        </div>
-    </main>
+<div id="placeholder" class="glass h-60 flex flex-col justify-center items-center text-slate-500">
+    <i data-lucide="heart-pulse" class="w-12 h-12 mb-3"></i>
+    <p class="font-bold">Espere el análisis clínico</p>
+</div>
 
-    <script>
-        lucide.createIcons();
-        const fileInput = document.getElementById('fileInput');
-        document.getElementById('dropzone').onclick = () => fileInput.click();
-        fileInput.onchange = () => { if(fileInput.files[0]) document.getElementById('fileName').innerText = fileInput.files[0].name; };
+<div id="resultados" class="hidden space-y-6">
 
-        async function analizar() {
-            if (!fileInput.files[0]) return alert("Por favor, suba el archivo CSV.");
-            const btn = document.getElementById('btnAnalizar');
-            btn.innerHTML = `<i data-lucide="loader" class="animate-spin"></i> ANALIZANDO...`;
-            lucide.createIcons();
+<!-- KPIs -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="glass p-5"><p class="text-xs text-slate-400">Pacientes</p><h3 id="kTotal" class="text-2xl font-black">-</h3></div>
+    <div class="glass p-5 border-l-4 border-red-500"><p class="text-xs text-red-400">Riesgo Alto</p><h3 id="kAlto" class="text-2xl font-black">-</h3></div>
+    <div class="glass p-5 border-l-4 border-yellow-500"><p class="text-xs text-yellow-400">Riesgo Moderado</p><h3 id="kMod" class="text-2xl font-black">-</h3></div>
+    <div class="glass p-5 border-l-4 border-green-500"><p class="text-xs text-green-400">Riesgo Bajo</p><h3 id="kBajo" class="text-2xl font-black">-</h3></div>
+</div>
 
-            const formData = new FormData();
-            formData.append("file", fileInput.files[0]);
+<!-- Pacientes críticos -->
+<div class="glass p-6">
+    <h2 class="font-black mb-4 flex gap-2"><i data-lucide="alert-triangle"></i> Pacientes Prioritarios</h2>
+    <div class="overflow-auto max-h-64">
+        <table class="w-full text-sm">
+            <thead class="text-slate-400">
+                <tr>
+                    <th class="text-left">Paciente</th>
+                    <th>Edad</th>
+                    <th>Riesgo</th>
+                    <th>Alertas</th>
+                </tr>
+            </thead>
+            <tbody id="tablaPacientes"></tbody>
+        </table>
+    </div>
+</div>
 
-            try {
-                const response = await fetch("https://analisis-rcv.onrender.com/analizar", {
-                    method: "POST",
-                    body: formData
-                });
-                const data = await response.json();
-                
-                document.getElementById('placeholder').classList.add('hidden');
-                document.getElementById('resultsContent').classList.remove('hidden');
-                
-                document.getElementById('statTotal').innerText = data.registros;
-                document.getElementById('statAlto').innerText = data.riesgo_alto;
-                document.getElementById('statMod').innerText = data.riesgo_moderado;
-                document.getElementById('statBajo').innerText = data.riesgo_bajo;
+<!-- Informe IA -->
+<div class="glass p-6">
+    <h2 class="font-black mb-4 flex gap-2"><i data-lucide="file-text"></i> Informe Médico IA</h2>
+    <div id="informeIA" class="text-sm text-slate-300 space-y-3 max-h-[400px] overflow-y-auto"></div>
+</div>
 
-                // --- LÓGICA DE FORMATEO MÉDICO ---
-                const lineas = data.analisis_ia.split('\n');
-                let htmlFinal = "";
-                let enLista = false;
+</div>
+</section>
+</main>
 
-                lineas.forEach(linea => {
-                    let texto = linea.replace(/\*\*/g, '').replace(/###/g, '').trim();
-                    if (!texto) return;
+<script>
+lucide.createIcons();
 
-                    // Detectar encabezados (como "Recomendaciones:" o "Análisis:")
-                    if (texto.endsWith(':') || texto.includes('Análisis') || texto.includes('Recomendaciones')) {
-                        if (enLista) { htmlFinal += "</ul>"; enLista = false; }
-                        htmlFinal += `<h3>${texto}</h3>`;
-                    } 
-                    // Detectar ítems de lista (empiezan con •, -, o número)
-                    else if (/^[•\-\d]/.test(texto)) {
-                        if (!enLista) { htmlFinal += "<ul>"; enLista = true; }
-                        htmlFinal += `<li>${texto.replace(/^[•\-\d\.]+\s*/, '')}</li>`;
-                    } 
-                    // Párrafos normales
-                    else {
-                        if (enLista) { htmlFinal += "</ul>"; enLista = false; }
-                        htmlFinal += `<p>${texto}</p>`;
-                    }
-                });
-                if (enLista) htmlFinal += "</ul>";
-                
-                document.getElementById('informeIA').innerHTML = htmlFinal;
+const fileInput = document.getElementById('fileInput');
+document.getElementById('dropzone').onclick = () => fileInput.click();
+fileInput.onchange = () => document.getElementById('fileName').innerText = fileInput.files[0]?.name || "";
 
-            } catch (e) {
-                alert("Error: El servidor está despertando. Intente de nuevo.");
-            } finally {
-                btn.innerHTML = `<i data-lucide="play-circle"></i> <span>CORRER AUDITORÍA</span>`;
-                lucide.createIcons();
-            }
-        }
-    </script>
+async function analizar() {
+    if (!fileInput.files[0]) return alert("Suba un archivo CSV");
+
+    document.getElementById('btnAnalizar').innerText = "Analizando...";
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    const res = await fetch("https://analisis-rcv.onrender.com/analizar", {
+        method: "POST",
+        body: formData
+    });
+
+    const data = await res.json();
+
+    document.getElementById('placeholder').classList.add('hidden');
+    document.getElementById('resultados').classList.remove('hidden');
+
+    document.getElementById('prestadorBox').classList.remove('hidden');
+    document.getElementById('prestadorNombre').innerText = data.prestador;
+
+    document.getElementById('kTotal').innerText = data.total_registros;
+    document.getElementById('kAlto').innerText = data.riesgo_alto;
+    document.getElementById('kMod').innerText = data.riesgo_moderado;
+    document.getElementById('kBajo').innerText = data.riesgo_bajo;
+
+    // Tabla pacientes
+    const tbody = document.getElementById('tablaPacientes');
+    tbody.innerHTML = "";
+    data.pacientes_prioritarios.forEach(p => {
+        tbody.innerHTML += `
+        <tr class="border-b border-slate-700">
+            <td>${p.nombre}</td>
+            <td class="text-center">${p.edad}</td>
+            <td class="text-center font-bold">${p.riesgo}</td>
+            <td class="text-xs">${p.alertas.join(", ")}</td>
+        </tr>`;
+    });
+
+    // Informe IA
+    document.getElementById('informeIA').innerText = data.analisis_ia;
+
+    document.getElementById('btnAnalizar').innerText = "ANALIZAR COHORTE";
+    lucide.createIcons();
+}
+</script>
 </body>
 </html>
