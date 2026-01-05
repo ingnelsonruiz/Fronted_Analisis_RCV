@@ -34,7 +34,7 @@
             <i data-lucide="shield-check" class="text-blue-400 w-5 h-5"></i>
             <div class="text-xs">
                 <p class="text-slate-500 uppercase font-bold text-[9px]">Estado del Motor</p>
-                <p class="font-bold text-blue-400">GPT-4o Medical Active</p>
+                <p class="font-bold text-blue-400">GPT-4o Medical Active (Cloud)</p>
             </div>
         </div>
     </header>
@@ -113,12 +113,10 @@
                     </div>
                     
                     <div class="glass-card p-8 bg-blue-600/5 border border-blue-500/20 overflow-y-auto h-[400px] custom-scrollbar">
-                        <div class="flex justify-between items-center mb-6">
-                            <h4 class="text-sm font-bold text-blue-400 flex items-center gap-2 uppercase tracking-widest">
-                                <i data-lucide="brain" class="w-5 h-5"></i> Informe del Director Médico (AI)
-                            </h4>
-                        </div>
-                        <div id="informeIA" class="text-sm leading-relaxed text-slate-300 space-y-4 italic">
+                        <h4 class="text-sm font-bold text-blue-400 flex items-center gap-2 uppercase tracking-widest mb-6">
+                            <i data-lucide="brain" class="w-5 h-5"></i> Informe del Director Médico (AI)
+                        </h4>
+                        <div id="informeIA" class="text-sm leading-relaxed text-slate-300 space-y-4 italic whitespace-pre-line">
                             </div>
                     </div>
                 </div>
@@ -138,8 +136,7 @@
                                     <th class="px-8 py-5 text-right">Clasificación de Riesgo</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableBody" class="divide-y divide-slate-800">
-                                </tbody>
+                            <tbody id="tableBody" class="divide-y divide-slate-800"></tbody>
                         </table>
                     </div>
                 </div>
@@ -178,18 +175,20 @@
             formData.append("file", fileInput.files[0]);
 
             try {
-                // Ajusta esta URL si tu servidor es local (http://127.0.0.1:8000/analizar)
-                const response = await fetch("http://127.0.0.1:8000/analizar", {
+                // URL DE TU BACKEND EN RENDER
+                const response = await fetch("https://analisis-rcv.onrender.com/analizar", {
                     method: "POST",
                     body: formData
                 });
+
+                if (!response.ok) throw new Error("Error en la respuesta del servidor.");
 
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
                 
                 mostrarResultados(data);
             } catch (err) {
-                alert("Error: Asegúrate que el Backend (Python) esté corriendo.");
+                alert("Error: El servidor de Render podría estar despertando. Intente nuevamente en 30 segundos.");
                 console.error(err);
             } finally {
                 btn.disabled = false;
@@ -202,16 +201,20 @@
             document.getElementById('placeholder').classList.add('hidden');
             document.getElementById('resultsContent').classList.remove('hidden');
 
-            // 1. Actualizar KPIs con los nombres correctos del backend
             document.getElementById('statTotal').textContent = data.registros;
             document.getElementById('statAlto').textContent = data.riesgo_alto;
             document.getElementById('statMod').textContent = data.riesgo_moderado;
             document.getElementById('statBajo').textContent = data.riesgo_bajo;
 
-            // 2. Insertar informe de la IA
-            document.getElementById('informeIA').innerHTML = `<p>${data.analisis_ia}</p>`;
+            // Formatear texto de la IA para que tenga párrafos
+            const textoIA = data.analisis_ia
+                .split('\n')
+                .filter(line => line.trim() !== '')
+                .map(line => `<p class="mb-2">${line.replace(/\*\*/g, '')}</p>`)
+                .join('');
+            
+            document.getElementById('informeIA').innerHTML = textoIA;
 
-            // 3. Llenar Tabla Médica
             const tableBody = document.getElementById('tableBody');
             tableBody.innerHTML = data.detalle_clinico.map(p => `
                 <tr class="hover:bg-blue-500/5 transition-colors border-l-4 border-transparent hover:border-blue-500">
