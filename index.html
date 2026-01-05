@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CardioCheck AI | Analítica Avanzada RCV</title>
+    <title>CardioCheck AI | Analítica Poblacional</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,7 +11,6 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 1.5rem; }
-        .gradient-border { border: 1px solid; border-image: linear-gradient(to right, #3b82f6, #ef4444) 1; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
@@ -21,129 +20,82 @@
     <header class="max-w-7xl mx-auto mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1">
-                <span class="flex h-3 w-3">
-                    <span class="animate-ping absolute inline-flex h-3 w-3 rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                 </span>
                 <h1 class="text-3xl font-extrabold tracking-tight">CardioCheck <span class="text-blue-500">AI</span></h1>
             </div>
-            <p class="text-slate-400 text-sm font-medium italic">Sistema de Soporte de Decisiones Clínicas (CDSS) basado en IA</p>
+            <p class="text-slate-400 text-sm font-medium italic">Dashboard de Analítica RCV Poblacional</p>
         </div>
-        <div class="flex gap-4">
-            <div class="glass-card px-4 py-2 flex items-center gap-3">
-                <i data-lucide="cloud-lightning" class="text-blue-400 w-5 h-5"></i>
-                <div class="text-xs">
-                    <p class="text-slate-500 uppercase font-bold text-[9px]">Motor de Análisis</p>
-                    <p class="font-bold text-blue-400">GPT-4o Medical Engine</p>
-                </div>
+        <div class="glass-card px-4 py-2 flex items-center gap-3">
+            <i data-lucide="shield-check" class="text-blue-400 w-5 h-5"></i>
+            <div class="text-xs">
+                <p class="text-slate-500 uppercase font-bold text-[9px]">Motor de Análisis</p>
+                <p class="font-bold text-blue-400">Poblacional Engine v2.0</p>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
         <div class="lg:col-span-4 space-y-6">
             <div class="glass-card p-8 border-t-4 border-blue-500 shadow-2xl">
                 <h2 class="text-xl font-bold mb-6 flex items-center gap-2 text-white">
-                    <i data-lucide="upload-cloud" class="text-blue-500"></i> Fuente de Datos
+                    <i data-lucide="upload-cloud" class="text-blue-500"></i> Carga de Cohorte
                 </h2>
                 
                 <div id="dropzone" class="border-2 border-dashed border-slate-700 rounded-2xl p-10 text-center hover:border-blue-500 hover:bg-blue-500/5 transition-all cursor-pointer group mb-6">
                     <input type="file" id="fileInput" class="hidden" accept=".csv" />
                     <div class="bg-blue-500/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                        <i data-lucide="file-text" class="text-blue-500 w-8 h-8"></i>
+                        <i data-lucide="file-spreadsheet" class="text-blue-500 w-8 h-8"></i>
                     </div>
-                    <p id="fileName" class="text-sm text-slate-300 font-semibold italic">Arrastra el reporte (.csv)</p>
-                    <p class="text-[10px] text-slate-500 mt-2">Formato compatible: UTF-8 / Latin-1</p>
+                    <p id="fileName" class="text-sm text-slate-300 font-semibold italic">Seleccionar CSV de la IPS</p>
                 </div>
                 
-                <button onclick="analizar()" id="btnAnalizar" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl transition-all shadow-lg flex justify-center items-center gap-3 transform hover:-translate-y-1 active:scale-95">
-                    <i data-lucide="brain-circuit" class="w-6 h-6"></i>
-                    <span>EJECUTAR MODELO IA</span>
+                <button onclick="analizar()" id="btnAnalizar" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-5 rounded-2xl transition-all shadow-lg flex justify-center items-center gap-3">
+                    <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                    <span>GENERAR INDICADORES</span>
                 </button>
-            </div>
-
-            <div class="glass-card p-5 bg-gradient-to-br from-slate-800 to-slate-900 border-l-4 border-emerald-500">
-                <div class="flex gap-4 items-center">
-                    <i data-lucide="book-open" class="text-emerald-500 w-8 h-8"></i>
-                    <div>
-                        <h4 class="text-xs font-bold text-emerald-500 uppercase tracking-tighter">Base de Conocimiento Activa</h4>
-                        <p class="text-[11px] text-slate-400">Res. 0256-2016 cargada exitosamente para validación cruzada.</p>
-                    </div>
-                </div>
             </div>
         </div>
 
         <div class="lg:col-span-8 space-y-8">
-            
-            <div id="placeholder" class="glass-card h-[600px] flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-800">
-                <i data-lucide="activity" class="w-20 h-20 opacity-10 mb-6 animate-pulse"></i>
-                <h3 class="text-xl font-bold text-slate-400">Consola de Análisis lista</h3>
-                <p class="text-sm">Inyecte un conjunto de datos para iniciar la segmentación</p>
+            <div id="placeholder" class="glass-card h-[500px] flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-800">
+                <i data-lucide="database" class="w-20 h-20 opacity-10 mb-6"></i>
+                <h3 class="text-xl font-bold text-slate-400">Esperando Datos Poblacionales</h3>
             </div>
 
-            <div id="resultsContent" class="hidden space-y-8 animate-in slide-in-from-bottom-10 duration-700">
-                
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div id="resultsContent" class="hidden space-y-8 animate-in fade-in duration-700">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="glass-card p-6 border-b-2 border-blue-500">
-                        <p class="text-[10px] uppercase font-black text-slate-500 mb-1">Total Muestra</p>
-                        <h3 id="statTotal" class="text-4xl font-black text-white">-</h3>
+                        <p class="text-[10px] uppercase font-black text-slate-500 mb-1">Prevalencia HTA</p>
+                        <h3 id="statHTA" class="text-3xl font-black text-white">-</h3>
                     </div>
                     <div class="glass-card p-6 border-b-2 border-red-500">
-                        <p class="text-[10px] uppercase font-black text-red-400 mb-1">Riesgo Muy Alto</p>
-                        <h3 id="statAlto" class="text-4xl font-black text-red-500">-</h3>
-                    </div>
-                    <div class="glass-card p-6 border-b-2 border-amber-500">
-                        <p class="text-[10px] uppercase font-black text-amber-400 mb-1">Moderado</p>
-                        <h3 id="statMod" class="text-4xl font-black text-amber-500">-</h3>
+                        <p class="text-[10px] uppercase font-black text-red-400 mb-1">Riesgo Alto</p>
+                        <h3 id="statRiesgo" class="text-3xl font-black text-red-500">-</h3>
                     </div>
                     <div class="glass-card p-6 border-b-2 border-emerald-500">
-                        <p class="text-[10px] uppercase font-black text-emerald-400 mb-1">En Metas</p>
-                        <h3 id="statBajo" class="text-4xl font-black text-emerald-500">-</h3>
+                        <p class="text-[10px] uppercase font-black text-emerald-400 mb-1">Diabetes Meta</p>
+                        <h3 id="statDM" class="text-3xl font-black text-emerald-500">-</h3>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="glass-card p-8 min-h-[350px]">
-                        <h4 class="text-sm font-bold text-slate-300 mb-6 flex items-center gap-2">
-                            <i data-lucide="pie-chart" class="w-4 h-4"></i> Segmentación Poblacional
-                        </h4>
-                        <div class="relative h-64">
-                            <canvas id="riesgoChart"></canvas>
+                <div class="glass-card p-8 bg-gradient-to-br from-blue-600/10 to-transparent border border-blue-500/20">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="bg-blue-500 p-2 rounded-lg">
+                            <i data-lucide="brain" class="text-white w-6 h-6"></i>
                         </div>
+                        <h4 class="text-lg font-bold text-white tracking-tight">Análisis Estratégico de la IA</h4>
                     </div>
-                    
-                    <div class="glass-card p-8 bg-blue-600/5 border border-blue-500/20">
-                        <div class="flex justify-between items-center mb-6">
-                            <h4 class="text-sm font-bold text-blue-400 flex items-center gap-2 uppercase tracking-widest">
-                                <i data-lucide="bot" class="w-5 h-5"></i> Diagnóstico de la IA
-                            </h4>
-                            <span class="text-[9px] bg-blue-500/20 text-blue-300 px-2 py-1 rounded">PROCESAMIENTO NLP</span>
+                    <div id="analisisEjecutivo" class="text-slate-300 leading-relaxed text-base italic whitespace-pre-line">
                         </div>
-                        <div id="resumenEjecutivo" class="text-sm leading-relaxed text-slate-300 space-y-4">
-                            </div>
-                    </div>
                 </div>
 
-                <div class="glass-card overflow-hidden">
-                    <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
-                        <h3 class="font-bold text-white flex items-center gap-2 italic">
-                            <i data-lucide="users" class="w-5 h-5 text-blue-500"></i> Listado de Intervención Prioritaria
-                        </h3>
-                    </div>
-                    <div class="overflow-x-auto custom-scrollbar h-[500px]">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="sticky top-0 bg-slate-900 shadow-xl z-10">
-                                <tr class="text-[10px] text-slate-500 uppercase font-black">
-                                    <th class="px-8 py-5">Información Paciente</th>
-                                    <th class="px-8 py-5">Hallazgos Críticos</th>
-                                    <th class="px-8 py-5 text-right">Análisis IA & Riesgo</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tableBody" class="divide-y divide-slate-800">
-                                </tbody>
-                        </table>
-                    </div>
+                <div class="glass-card p-8">
+                    <h4 class="text-sm font-bold text-slate-400 mb-6 uppercase tracking-widest">Resumen Técnico de Cohorte</h4>
+                    <div id="resumenTecnico" class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        </div>
                 </div>
             </div>
         </div>
@@ -151,29 +103,20 @@
 
     <script>
         lucide.createIcons();
-
-        const dropzone = document.getElementById('dropzone');
         const fileInput = document.getElementById('fileInput');
-        const fileNameSpan = document.getElementById('fileName');
-        let myChart = null;
+        const dropzone = document.getElementById('dropzone');
 
         dropzone.onclick = () => fileInput.click();
         fileInput.onchange = () => {
-            if(fileInput.files.length) {
-                fileNameSpan.textContent = fileInput.files[0].name;
-                fileNameSpan.classList.add('text-blue-400');
-            }
+            if(fileInput.files.length) document.getElementById('fileName').textContent = fileInput.files[0].name;
         };
 
         async function analizar() {
-            if (!fileInput.files.length) {
-                alert("Por favor cargue un archivo CSV");
-                return;
-            }
+            if (!fileInput.files.length) return alert("Cargue un CSV");
 
             const btn = document.getElementById('btnAnalizar');
             btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="refresh-cw" class="w-6 h-6 animate-spin"></i> CALCULANDO...`;
+            btn.innerHTML = `<i data-lucide="loader-2" class="animate-spin"></i> PROCESANDO COHORTE...`;
             lucide.createIcons();
 
             const formData = new FormData();
@@ -184,17 +127,13 @@
                     method: "POST",
                     body: formData
                 });
-
                 const data = await response.json();
-                if (data.error) throw new Error(data.error);
-                
                 mostrarResultados(data);
             } catch (err) {
-                alert("Error: El servidor está despertando. Reintenta en 10 segundos.");
-                console.error(err);
+                alert("Error de conexión con el backend");
             } finally {
                 btn.disabled = false;
-                btn.innerHTML = `<i data-lucide="brain-circuit" class="w-6 h-6"></i> <span>EJECUTAR MODELO IA</span>`;
+                btn.innerHTML = `<i data-lucide="bar-chart-3"></i> <span>GENERAR INDICADORES</span>`;
                 lucide.createIcons();
             }
         }
@@ -203,86 +142,36 @@
             document.getElementById('placeholder').classList.add('hidden');
             document.getElementById('resultsContent').classList.remove('hidden');
 
-            // Actualizar KPIs
-            document.getElementById('statTotal').textContent = data.registros;
-            document.getElementById('statAlto').textContent = data.riesgo_alto;
-            document.getElementById('statMod').textContent = data.riesgo_moderado;
-            document.getElementById('statBajo').textContent = data.riesgo_bajo;
+            const ind = data.indicadores_generales;
+            
+            // Llenar KPIs
+            document.getElementById('statHTA').textContent = ind.prevalencia_hta;
+            document.getElementById('statRiesgo').textContent = ind.riesgo_alto_poblacional;
+            document.getElementById('statDM').textContent = ind.prevalencia_diabetes;
 
-            // IA Executive Summary
-            const resumen = document.getElementById('resumenEjecutivo');
-            const porcAlto = Math.round((data.riesgo_alto/data.registros)*100);
-            resumen.innerHTML = `
-                <div class="border-l-2 border-blue-500 pl-4">
-                    <p class="text-xs text-slate-400 mb-1">CONCLUSIÓN GENERAL</p>
-                    <p class="font-medium">Se detectó una prevalencia del <span class="text-red-500 font-bold">${porcAlto}%</span> de riesgo alto en la muestra. Los factores determinantes son la edad avanzada y la descompensación glucémica detectada en los reportes.</p>
+            // Llenar Análisis IA
+            document.getElementById('analisisEjecutivo').textContent = data.analisis_ejecutivo_ia;
+
+            // Llenar Resumen Técnico
+            const tecnico = document.getElementById('resumenTecnico');
+            tecnico.innerHTML = `
+                <div>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase">Total Pacientes</p>
+                    <p class="text-xl font-bold">${ind.total_pacientes}</p>
                 </div>
-                <div class="border-l-2 border-emerald-500 pl-4">
-                    <p class="text-xs text-slate-400 mb-1">SUGERENCIA ADMINISTRATIVA</p>
-                    <p class="font-medium text-slate-400">Se recomienda abrir <span class="text-white font-bold">${data.riesgo_alto} cupos</span> extraordinarios de Medicina Interna para la próxima semana.</p>
+                <div>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase">Obesidad</p>
+                    <p class="text-xl font-bold text-orange-400">${ind.prevalencia_obesidad}</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase">Promedio LDL</p>
+                    <p class="text-xl font-bold text-blue-400">${ind.promedio_ldl_poblacion} mg/dL</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase">Estado Meta</p>
+                    <p class="text-xl font-bold text-emerald-500">Verificado</p>
                 </div>
             `;
-
-            // Tabla Médica
-            const tableBody = document.getElementById('tableBody');
-            tableBody.innerHTML = data.detalle_clinico.map(p => `
-                <tr class="hover:bg-blue-500/5 transition-colors border-l-2 border-transparent hover:border-blue-500">
-                    <td class="px-8 py-6">
-                        <p class="font-extrabold text-white text-base">${p.nombre}</p>
-                        <p class="text-[11px] text-slate-500 font-bold mt-1 uppercase tracking-widest">${p.edad || '??'} años • ID PACIENTE: RCV-${Math.floor(Math.random()*1000)}</p>
-                    </td>
-                    <td class="px-8 py-6">
-                        <div class="flex flex-wrap gap-2">
-                            ${p.alertas.map(a => `
-                                <span class="bg-red-500/10 text-red-400 text-[10px] px-3 py-1 rounded-md border border-red-500/20 font-bold uppercase">
-                                    ${a}
-                                </span>
-                            `).join('') || '<span class="text-slate-600 text-xs italic">Parámetros Normales</span>'}
-                        </div>
-                    </td>
-                    <td class="px-8 py-6 text-right">
-                        <span class="inline-block px-4 py-1.5 rounded-full text-[11px] font-black italic shadow-lg ${getBadgeStyle(p.riesgo)}">
-                            ${p.riesgo}
-                        </span>
-                        <p class="text-[11px] mt-3 text-slate-400 font-medium max-w-[200px] ml-auto leading-tight line-clamp-2" title="${p.sugerencia}">
-                            "${p.sugerencia}"
-                        </p>
-                    </td>
-                </tr>
-            `).join('');
-
-            renderChart(data);
-        }
-
-        function getBadgeStyle(riesgo) {
-            if (riesgo === 'ALTO') return 'bg-red-600 text-white shadow-red-900/40';
-            if (riesgo === 'MODERADO') return 'bg-amber-500 text-slate-900 shadow-amber-900/40';
-            return 'bg-emerald-500 text-white shadow-emerald-900/40';
-        }
-
-        function renderChart(data) {
-            const ctx = document.getElementById('riesgoChart').getContext('2d');
-            if (myChart) myChart.destroy();
-            myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Riesgo Alto', 'Moderado', 'Bajo'],
-                    datasets: [{
-                        data: [data.riesgo_alto, data.riesgo_moderado, data.riesgo_bajo],
-                        backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
-                        borderWidth: 0,
-                        hoverOffset: 20
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '80%',
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#94a3b8', padding: 20, font: { weight: 'bold', size: 11 } } }
-                    }
-                }
-            });
         }
     </script>
 </body>
